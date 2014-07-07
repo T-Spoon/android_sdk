@@ -34,6 +34,11 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.json.JSONObject;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -47,21 +52,21 @@ public class RequestHandler extends HandlerThread implements IRequestHandler {
     private IPackageHandler packageHandler;
     private HttpClient      httpClient;
     private Logger          logger;
+    private Context         context;
 
-    public RequestHandler(IPackageHandler packageHandler) {
+    public RequestHandler(IPackageHandler packageHandler, Context context) {
         super(Constants.LOGTAG, MIN_PRIORITY);
         setDaemon(true);
         start();
 
         this.logger = AdjustFactory.getLogger();
         this.internalHandler = new InternalHandler(getLooper(), this);
-
         this.packageHandler = packageHandler;
+        this.context = context;
 
         Message message = Message.obtain();
         message.arg1 = InternalHandler.INIT;
         internalHandler.sendMessage(message);
-
     }
 
     @Override
@@ -146,6 +151,8 @@ public class RequestHandler extends HandlerThread implements IRequestHandler {
 
         packageHandler.finishedTrackingActivity(activityPackage, responseData);
         packageHandler.sendNextPackage();
+
+        launchDeepLink(jsonObject);
     }
 
     private String parseResponse(HttpResponse response) {
@@ -217,5 +224,28 @@ public class RequestHandler extends HandlerThread implements IRequestHandler {
         request.setEntity(entity);
 
         return request;
+    }
+
+    private void launchDeepLink(JSONObject jsonObject) {
+        String deepLink = jsonObject.optString("deeplink", null);
+
+        if (deepLink == null) return;
+
+        Uri location = Uri.parse(deepLink);
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, location);
+
+        // Verify it resolves
+        PackageManager packageManager = context.getPackageManager();
+        List<ResolveInfo> activities = packageManager.queryIntentActivities(mapIntent, 0);
+        boolean isIntentSafe = activities.size() > 0;
+
+        // Start an activity if it's safe
+        if (!isIntentSafe) {
+            logger.error(String.format("Unable to open deep link (%s)", deepLink));
+            return;
+        }
+
+        logger.info(String.format("Open deep link (%s)", deepLink));
+        context.startActivity(mapIntent);
     }
 }

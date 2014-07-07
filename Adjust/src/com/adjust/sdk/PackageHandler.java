@@ -119,6 +119,7 @@ public class PackageHandler extends HandlerThread implements IPackageHandler {
         }
     }
 
+    @Override
     public boolean dropsOfflineActivities() {
         return dropOfflineActivities;
     }
@@ -172,7 +173,7 @@ public class PackageHandler extends HandlerThread implements IPackageHandler {
     // internal methods run in dedicated queue thread
 
     private void initInternal() {
-        requestHandler = AdjustFactory.getRequestHandler(this);
+        requestHandler = AdjustFactory.getRequestHandler(this, context);
 
         isSending = new AtomicBoolean();
 
