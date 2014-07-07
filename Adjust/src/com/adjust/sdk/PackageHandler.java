@@ -22,7 +22,6 @@ import java.io.OptionalDataException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.content.Context;
@@ -182,7 +181,7 @@ public class PackageHandler extends HandlerThread implements IPackageHandler {
 
     private void addInternal(ActivityPackage newPackage) {
         packageQueue.add(newPackage);
-        logger.debug(String.format(Locale.US, "Added package %d (%s)", packageQueue.size(), newPackage));
+        logger.debug("Added package %d (%s)", packageQueue.size(), newPackage);
         logger.verbose(newPackage.getExtendedString());
 
         writePackageQueue();
@@ -228,7 +227,7 @@ public class PackageHandler extends HandlerThread implements IPackageHandler {
                 Object object = objectStream.readObject();
                 @SuppressWarnings("unchecked")
                 List<ActivityPackage> packageQueue = (List<ActivityPackage>) object;
-                logger.debug(String.format(Locale.US, "Package handler read %d packages", packageQueue.size()));
+                logger.debug("Package handler read %d packages", packageQueue.size());
                 this.packageQueue = packageQueue;
                 return;
             } catch (ClassNotFoundException e) {
@@ -269,14 +268,14 @@ public class PackageHandler extends HandlerThread implements IPackageHandler {
 
             try {
                 objectStream.writeObject(packageQueue);
-                logger.debug(String.format(Locale.US, "Package handler wrote %d packages", packageQueue.size()));
+                logger.debug("Package handler wrote %d packages", packageQueue.size());
             } catch (NotSerializableException e) {
                 logger.error("Failed to serialize packages");
             } finally {
                 objectStream.close();
             }
         } catch (Exception e) {
-            logger.error(String.format("Failed to write packages (%s)", e.getLocalizedMessage()));
+            logger.error("Failed to write packages (%s)", e.getLocalizedMessage());
             e.printStackTrace();
         }
     }
