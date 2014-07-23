@@ -38,6 +38,4 @@ public interface Constants {
     String REFERRER  = "referrer";
 
     String ENCODING = "UTF-8";
-    String MD5      = "MD5";
-    String SHA1     = "SHA-1";
 }

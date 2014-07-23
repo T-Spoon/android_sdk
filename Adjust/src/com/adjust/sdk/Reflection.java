@@ -50,6 +50,42 @@ public class Reflection {
         return false;
     }
 
+    public static String getMacSha1(Context context) {
+        try {
+            String macSha1 = (String) invokeStaticMethod("com.adjust.sdk.deviceIds.MacAdressUtil", "getMacSha1"
+                    ,new Class[] {Context.class}, context);
+
+            return macSha1;
+        }
+        catch (Throwable t) { }
+
+        return null;
+    }
+
+    public static String getMacShortMd5(Context context) {
+        try {
+            String macShortMd5 = (String) invokeStaticMethod("com.adjust.sdk.deviceIds.MacAdressUtil", "getMacShortMd5"
+                    ,new Class[] {Context.class}, context);
+
+            return macShortMd5;
+        }
+        catch (Throwable t) { }
+
+        return null;
+    }
+
+    public static String getAndroidId(Context context) {
+        try {
+            String androidId = (String) invokeStaticMethod("com.adjust.sdk.deviceIds.AndroidIdUtil", "getAndroidId"
+                    ,new Class[] {Context.class}, context);
+
+            return androidId;
+        }
+        catch (Throwable t) { }
+
+        return null;
+    }
+
     private static boolean isConnectionResultSuccess(Integer statusCode) {
         if (statusCode == null) {
             return false;
